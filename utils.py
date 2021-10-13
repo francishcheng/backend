@@ -75,7 +75,7 @@ def get_dataloader(df, feature_cols, label_cols):
     features = torch.tensor(test_x.values, dtype=torch.float32)
 
     test = data_utils.TensorDataset(features, label)
-    test_loader = data_utils.DataLoader(test, batch_size=40, shuffle=True)
+    test_loader = data_utils.DataLoader(test, batch_size=50, shuffle=True)
     return train_loader, test_loader
 
 def train(dataloader, model, loss_fn, optimizer):
