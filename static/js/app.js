@@ -7,6 +7,7 @@ document.getElementsByTagName('head')[0].appendChild(script);
 const record = document.querySelector('.record');
 const stop = document.querySelector('.stop');
 const send = document.querySelector('.send');
+const train = document.querySelector('.train');
 const calculate = document.querySelector('.calculate');
 const soundClips = document.querySelector('.sound-clips');
 const canvas = document.querySelector('.visualizer');
@@ -21,27 +22,10 @@ let audioCtx;
 let global_chunks = [];
 let global_clip_name = [];
 calculate.onclick = function(){
-  alert('calculating')
-}
-send.onclick = function () {
-  console.log(global_chunks);
-  console.log(global_clip_name);
-
-  // $.ajax({
-  //   url: "http://127.0.0.1:8000/",
-  //   crossDomain: true,
-  //   success: function (result) {
-  //     console.log(result)
-  //   }
-  // });
+  alert('calculating');
 
   var fd = new FormData();
 
-  // fd.append('username', 'test1.ogg');
-  // fd.append('username', 'test2.ogg');
-    // fd.append('file', global_chunks[0], 'blob1');
-  // fd.append('file', global_chunks[0], 'blob1');
-  // fd.append('file', global_chunks[1], 'blob2');
   for(var i=0;i<global_chunks.length;i++)
   {
     fd.append('file', global_chunks[i], 'blob');
@@ -50,9 +34,32 @@ send.onclick = function () {
   {
     fd.append('clipnames', global_clip_name[i]);
   }
-  // console.log('type', global_chunks[0])
   var settings = {
-    "url": "/save/",
+    "url": "/calculate/",
+    "method": "POST",
+    "processData": false,
+    "contentType": false,
+    "data": fd,
+    cache: false,
+  };
+  $.ajax(settings).done(function (response) {
+    alert('clips sent successfuly')
+    console.log(response)
+    var ele = document.getElementsByClassName("result");
+    
+    // ele[0].innerHTML = JSON.stringify(response);
+    for (const [ key, value ] of Object.entries(response)) {
+          console.log(key, value); 
+          ele[0].innerHTML += (key + ' |||||| ' + value + '<br>' );
+    }
+  });  
+}
+train.onclick = function(){
+  alert('trainingi, plz wait...');
+  var fd = new FormData();
+  fd.append('msg', 'training');
+  var settings = {
+    "url": "/train/",
     "method": "POST",
     "processData": false,
     "contentType": false,
@@ -63,17 +70,33 @@ send.onclick = function () {
 
   $.ajax(settings).done(function (response) {
 
+    alert('training completed, model saved!')
+  });  
+}
+send.onclick = function () {
+  // console.log(global_chunks);
+  // console.log(global_clip_name);
+  var fd = new FormData();
+
+  for(var i=0;i<global_chunks.length;i++)
+  {
+    fd.append('file', global_chunks[i], 'blob');
+  }
+  for(var i=0;i<global_clip_name.length;i++)
+  {
+    fd.append('clipnames', global_clip_name[i]);
+  }
+  var settings = {
+    "url": "/save/",
+    "method": "POST",
+    "processData": false,
+    "contentType": false,
+    "data": fd,
+    cache: false,
+  };
+  $.ajax(settings).done(function (response) {
     alert('clips sent successfuly')
   });  
-  // $.ajax({
-  //     type: 'POST',
-  //     url: 'http://127.0.0.1:8000/login/',
-  //     data: fd,
-  //     processData: false,
-  //     contentType: false, 
-  // }).done(function(data) {
-  //       console.log(data);
-  // });
 }
 const canvasCtx = canvas.getContext("2d");
 //main block for doing the audio recording
